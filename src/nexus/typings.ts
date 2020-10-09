@@ -56,6 +56,7 @@ export interface NexusGenFieldTypes {
   Query: { // field return type
     date: NexusGenScalars['Date']; // Date!
     name: string; // String!
+    score: number; // Int!
   }
   Subscription: { // field return type
     count: number; // Int!

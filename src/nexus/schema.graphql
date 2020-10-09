@@ -10,6 +10,7 @@ scalar Date
 type Query {
   date: Date!
   name: String!
+  score: Int!
 }
 
 type Subscription {
