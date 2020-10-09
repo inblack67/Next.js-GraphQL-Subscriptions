@@ -1,4 +1,4 @@
-import { useQuery, gql } from '@apollo/client'
+import { useSubscription, gql, useQuery } from '@apollo/client'
 import { initializeApollo } from '../src/apollo'
 
 const IntroQuery = gql`
@@ -8,11 +8,19 @@ query IntroQuery {
 }
 `;
 
+const SubQuery = gql`
+subscription{
+  count
+}
+`;
+
 export default function Home() {
 
   const { loading, error, data } = useQuery(IntroQuery);
 
-  if (loading) {
+  const subRes = useSubscription(SubQuery);
+
+  if (loading ?? subRes.loading) {
     return <h1>Loading...</h1>
   }
 
@@ -26,6 +34,9 @@ export default function Home() {
       <h3>
         {date}
       </h3>
+      <h1>Count : {subRes.data ? subRes.data.count : 0}</h1>
+      <h2>
+      </h2>
     </div>
   )
 }

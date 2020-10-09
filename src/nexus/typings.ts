@@ -39,7 +39,7 @@ export interface NexusGenScalars {
 export interface NexusGenRootTypes {
   Query: {};
   Subscription: { // root type
-    count: number; // Int!
+    count?: number | null; // Int
   }
 }
 
@@ -59,7 +59,7 @@ export interface NexusGenFieldTypes {
     score: number; // Int!
   }
   Subscription: { // field return type
-    count: number; // Int!
+    count: number | null; // Int
     date: NexusGenScalars['Date']; // Date!
     name: string; // String!
   }

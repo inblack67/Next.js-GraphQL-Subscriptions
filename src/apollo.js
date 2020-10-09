@@ -1,6 +1,9 @@
 import { useMemo } from 'react'
 import { ApolloClient, InMemoryCache } from '@apollo/client'
 import { onError } from "@apollo/client/link/error";
+import { split, HttpLink } from '@apollo/client';
+import { getMainDefinition } from '@apollo/client/utilities';
+
 
 let apolloClient;
 
@@ -11,10 +14,29 @@ function createIsomorphLink() {
         return new SchemaLink({ schema })
     } else {
         const { HttpLink } = require('@apollo/client/link/http')
-        return new HttpLink({
-            uri: '/api/graphql',
+        const { WebSocketLink } = require('@apollo/client/link/ws');
+        const httpLink = new HttpLink({
+            uri: '/graphql',
             credentials: 'same-origin',
         })
+        const wsLink = new WebSocketLink({
+            uri: `ws://localhost:3000/graphql`,
+            options: {
+              reconnect: true
+            },
+          });
+        const splitLink = split(
+            ({ query }) => {
+              const definition = getMainDefinition(query);
+              return (
+                definition.kind === 'OperationDefinition' &&
+                definition.operation === 'subscription'
+              );
+            },
+            wsLink,
+            httpLink,
+        );
+        return splitLink;
     }
 }
 

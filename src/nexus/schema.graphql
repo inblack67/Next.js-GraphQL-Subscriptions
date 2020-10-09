@@ -14,7 +14,7 @@ type Query {
 }
 
 type Subscription {
-  count: Int!
+  count: Int
   date: Date!
   name: String!
 }
