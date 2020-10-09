@@ -38,6 +38,9 @@ export interface NexusGenScalars {
 
 export interface NexusGenRootTypes {
   Query: {};
+  Subscription: { // root type
+    count: number; // Int!
+  }
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
@@ -54,6 +57,11 @@ export interface NexusGenFieldTypes {
     date: NexusGenScalars['Date']; // Date!
     name: string; // String!
   }
+  Subscription: { // field return type
+    count: number; // Int!
+    date: NexusGenScalars['Date']; // Date!
+    name: string; // String!
+  }
 }
 
 export interface NexusGenArgTypes {
@@ -64,7 +72,7 @@ export interface NexusGenAbstractResolveReturnTypes {
 
 export interface NexusGenInheritedFields {}
 
-export type NexusGenObjectNames = "Query";
+export type NexusGenObjectNames = "Query" | "Subscription";
 
 export type NexusGenInputNames = never;
 

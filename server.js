@@ -1,21 +1,30 @@
 const express = require('express');
 const next = require('next');
-const { ApolloServer } = require('apollo-server-express');
+const { ApolloServer, PubSub } = require('apollo-server-express');
+const { execute, subscribe } = require('graphql');
+const {SubscriptionServer} = require('subscriptions-transport-ws');
+const http = require('http');
 const { schema } = require('./src/schema');
 require('colors');
 
-const port = parseInt(process.env.PORT, 10) || 3000;
+const PORT = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
 const nextApp = next({ dev });
 const handle = nextApp.getRequestHandler();
 
+const pubsub = new PubSub();
+
 const app = express();
 const apolloServer = new ApolloServer({
   schema,
+  context: ({req,res}) => ({req, res, pubsub}),
 });
 
+const ws = http.createServer(app);
+
 nextApp.prepare().then(() => {
-  apolloServer.applyMiddleware({ app });
+
+  apolloServer.applyMiddleware({app, ws});
 
   app.get('/api', (req, res) => {
     res
@@ -27,8 +36,15 @@ nextApp.prepare().then(() => {
     return handle(req, res);
   });
 
-  app.listen(port, (err) => {
-    if (err) throw err;
-    console.log(`Server started on port ${port}`.green.bold);
+  ws.listen(PORT, () => {
+    console.log(`Server started on port ${PORT}`.green.bold);
+    new SubscriptionServer({
+      execute,
+      subscribe,
+      schema,
+    }, {
+      server: ws,
+      path: '/graphql',
+    });
   });
 });
